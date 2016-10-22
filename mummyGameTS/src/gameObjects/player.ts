@@ -10,7 +10,11 @@
 
         constructor(game: Phaser.Game, level: Level01, x: number, y: number) {
 
-            this.cursors = game.input.keyboard.createCursorKeys();
+            this.cursors = game.input.keyboard.addKeys({
+                'wasd': Phaser.KeyCode.F1,
+                'arows': Phaser.KeyCode.F2,
+            });
+
             this.level = level;
             this.game = game;
             super(game, x, y, 'char', 1);
@@ -33,14 +37,21 @@
             this.anchor.set(0.5);
 
             this.movementSpeed = 100;
-            this.movement = new Movement(game, this);
+            this.movement = new Movement(game, this, 'arows');
         }
 
         update() {
             this.body.velocity.x = 0;
             var hitPlatforms = this.game.physics.arcade.collide(this, this.level.platforms);
 
-            this.movement.arowsMove(hitPlatforms);
+            // Teste
+            if (this.cursors.wasd.isDown) {
+                this.movement.setMovementType('wasd');
+            } else if (this.cursors.arows.isDown) {
+                this.movement.setMovementType('arows');
+            }
+
+            this.movement.move(hitPlatforms);
             this.game.physics.arcade.overlap(this, this.level.stars, this.collectStar, null);
         }
 
