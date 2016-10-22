@@ -2,17 +2,17 @@
 
     export class Movement{
         object: any;
+        game: Phaser.Game;
         arows: any;
         
-        constructor(game: Phaser.Game, object: any) {
+        constructor(game: Phaser.Game, object: any, type: string) {
             this.object = object;
-            this.arows = game.input.keyboard.createCursorKeys();
+            this.game = game;
+            this.setMovementType(type);
         }
 
-        arowsMove(hitPlatform: boolean)
+        move(hitPlatform: boolean)
         {
-            console.log(this.object);
-
             if (this.arows.left.isDown) {
                 this.moveLeft();
             } else if (this.arows.right.isDown) {
@@ -23,22 +23,45 @@
             }
 
             if (this.arows.up.isDown && this.object.body.touching.down && hitPlatform) {
-                this.object.body.velocity.y = -300;
+                this.jump();
             }
         }
 
-        moveLeft() {
+        moveLeft()
+        {
             this.object.scale.set(-1, 1);
             this.object.body.velocity.x = - this.object.movementSpeed;
             this.object.animations.play('left');
         }
 
-        moveRight() {
+        moveRight()
+        {
             this.object.scale.set(1, 1);
             this.object.body.velocity.x = this.object.movementSpeed;
             this.object.animations.play('right');
         }
 
+        jump()
+        {
+            this.object.body.velocity.y = -300;
+        }
+
+        setMovementType(type: string) {
+            if (type == 'wasd') {
+                this.arows = this.game.input.keyboard.addKeys({
+                    'up': Phaser.KeyCode.W,
+                    'down': Phaser.KeyCode.S,
+                    'left': Phaser.KeyCode.A,
+                    'right': Phaser.KeyCode.D
+                });
+
+                // Para previnir o CTRL+W do browser
+                this.game.input.keyboard.addKeyCapture(Phaser.Keyboard.W);
+
+            } else if (type == 'arows') {
+                this.arows = this.game.input.keyboard.createCursorKeys();
+            }
+        }
     }
 
 }
